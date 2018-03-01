@@ -27,6 +27,23 @@ extension MultipleImagesViewController {
     
     fileprivate func setPage() {
         self.navigationController?.navigationBar.isHidden = true
+        title = "多图查看器"
+        setButtons()
+    }
+    
+    ///set UIButton 设置按钮
+    fileprivate func setButtons() {
+        let button = UIButton(type: .system)
+        button.setTitle("点击加载图片查看器", for: .normal)
+        button.frame = CGRect(x: 0, y: screenHeight / 2, width: screenWidth, height: 100)
+        button.backgroundColor = UIColor.gray
+        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        view.addSubview(button)
+    }
+    
+    ///buttonAction
+    @objc fileprivate func buttonAction() {
+        print(#function)
         setZZJMultipleImagesContentView()
     }
     
@@ -39,8 +56,8 @@ extension MultipleImagesViewController {
             imagesArray.append(model)
         }
         
-        let multipleImagesView = ZZJMultipleImagesContentView(frame: self.view.bounds, imagesArray: imagesArray)
-        view.addSubview(multipleImagesView)
+        let multipleImagesView = ZZJMultipleImagesContentView(frame: .zero, imagesArray: imagesArray)
+        multipleImagesView.showInView(view: ZZJKeyWindow)
     }
 }
 

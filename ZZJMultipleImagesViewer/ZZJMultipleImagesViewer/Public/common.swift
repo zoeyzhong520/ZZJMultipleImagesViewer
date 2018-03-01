@@ -14,3 +14,6 @@ let screenWidth = UIScreen.main.bounds.size.width
 
 ///屏幕高度
 let screenHeight = UIScreen.main.bounds.size.height
+
+///keyWindow
+let ZZJKeyWindow = UIApplication.shared.keyWindow
