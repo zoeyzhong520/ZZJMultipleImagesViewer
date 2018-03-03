@@ -23,17 +23,23 @@ class ZZJMultipleImagesContentView: UIView {
     private var imageView:UIImageView!
     
     ///oldFrame 保存图片原来的大小
-    var oldFrame: CGRect!
+    private var oldFrame: CGRect!
     
     ///largeFrame 确定图片放大最大的程度
-    var largeFrame: CGRect!
+    private var largeFrame: CGRect!
+    
+    ///currentIndexOfImage 当前是第几张
+    private var currentIndexOfImage:Int = 0
+    
+    ///imageViewArray 存放imageView的数组
+    private var imageViewArray = [UIImageView]()
     
     init(frame: CGRect, imagesArray:[MultipleImagesModel]) {
         super.init(frame: frame)
         self.imagesArray = imagesArray
         //imageCount
-//        imageCount = imagesArray.count
-        imageCount = 1
+        imageCount = imagesArray.count
+//        imageCount = 1
         createView()
     }
     
@@ -60,7 +66,7 @@ extension ZZJMultipleImagesContentView {
             scrollView.delegate = self
             
             self.addTapGestureRecognizer(view: scrollView)
-            self.addSwipeGestureRecognizer(view: scrollView)
+//            self.addSwipeGestureRecognizer(view: scrollView)
             
             addSubview(scrollView)
             scrollView.contentSize = CGSize(width: screenWidth * CGFloat(imageCount), height: screenHeight)
@@ -75,8 +81,10 @@ extension ZZJMultipleImagesContentView {
                 
                 imageView.isUserInteractionEnabled = true
                 self.addPinchGestureRecognizer(view: imageView)
+                imageView.tag = i
                 
                 scrollView.addSubview(imageView)
+                imageViewArray.append(imageView)
             }
         }
     }
@@ -132,7 +140,9 @@ extension ZZJMultipleImagesContentView {
             }
             
             pinch.scale = 1
+            
         }
+        
     }
     
     //MARK: 展示图片查看器
@@ -145,7 +155,7 @@ extension ZZJMultipleImagesContentView {
         view?.addSubview(scrollView)
         
         scrollView.alpha = 0.0
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: 0.5, animations: {
             self.scrollView.alpha = 1.0
         }, completion: nil)
     }
@@ -153,7 +163,7 @@ extension ZZJMultipleImagesContentView {
     //MARK: 隐藏图片查看器
     fileprivate func disMissView() {
         scrollView.alpha = 1.0
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: 0.5, animations: {
             self.scrollView.alpha = 0.0
         }) { (finished) in
             self.removeFromSuperview()
@@ -175,6 +185,10 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         print(#function)
+        
+        //currentIndexOfImage
+        currentIndexOfImage = Int(scrollView.contentOffset.x / screenWidth)
+        print("当前是第\(currentIndexOfImage+1)张图片～")
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

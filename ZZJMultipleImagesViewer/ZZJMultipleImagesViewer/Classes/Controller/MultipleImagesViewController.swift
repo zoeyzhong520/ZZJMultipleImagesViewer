@@ -34,9 +34,10 @@ extension MultipleImagesViewController {
     ///set UIButton 设置按钮
     fileprivate func setButtons() {
         let button = UIButton(type: .system)
+        button.setTitleColor(UIColor.white, for: .normal)
         button.setTitle("点击加载图片查看器", for: .normal)
-        button.frame = CGRect(x: 0, y: screenHeight / 2, width: screenWidth, height: 100)
-        button.backgroundColor = UIColor.gray
+        button.frame = CGRect(x: 0, y: (screenHeight - 100) / 2, width: screenWidth, height: 100)
+        button.backgroundColor = HexColor("ff99ff")
         button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
         view.addSubview(button)
     }

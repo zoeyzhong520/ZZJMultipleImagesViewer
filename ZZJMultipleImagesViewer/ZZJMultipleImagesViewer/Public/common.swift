@@ -17,3 +17,39 @@ let screenHeight = UIScreen.main.bounds.size.height
 
 ///keyWindow
 let ZZJKeyWindow = UIApplication.shared.keyWindow
+
+///RGB
+let RGB: (CGFloat, CGFloat, CGFloat) -> UIColor = { r, g, b in
+    return UIColor(red: r, green: g, blue: b, alpha: 1.0)
+}
+
+///RGBA
+let RGBA: (CGFloat, CGFloat, CGFloat, CGFloat) -> UIColor = {
+    r, g, b, a in
+    return UIColor(red: r, green: g, blue: b, alpha: a)
+}
+
+///colorWithHexString
+let HexColor: (String) -> UIColor = {
+    hexString in
+    UIColor.colorWithHexString(color: hexString)
+}
+
+///colorWithHexString && Alpha
+let HexColorAlpha: (String, CGFloat) -> UIColor = {
+    hexString, alpha in
+    UIColor.colorWithHexString(color: hexString, alpha: alpha)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

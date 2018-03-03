@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D80751B3204A8E7400068226 /* UIColor+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80751B2204A8E7400068226 /* UIColor+Util.swift */; };
 		D8BB7D352046F5FD00D45B77 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BB7D342046F5FD00D45B77 /* AppDelegate.swift */; };
 		D8BB7D372046F5FD00D45B77 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BB7D362046F5FD00D45B77 /* ViewController.swift */; };
 		D8BB7D3A2046F5FD00D45B77 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8BB7D382046F5FD00D45B77 /* Main.storyboard */; };
@@ -47,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D80751B2204A8E7400068226 /* UIColor+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Util.swift"; sourceTree = "<group>"; };
 		D8BB7D312046F5FD00D45B77 /* ZZJMultipleImagesViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZZJMultipleImagesViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8BB7D342046F5FD00D45B77 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D8BB7D362046F5FD00D45B77 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -100,6 +102,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D80751B1204A8E6600068226 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				D80751B2204A8E7400068226 /* UIColor+Util.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		D8BB7D282046F5FD00D45B77 = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +133,7 @@
 		D8BB7D332046F5FD00D45B77 /* ZZJMultipleImagesViewer */ = {
 			isa = PBXGroup;
 			children = (
+				D80751B1204A8E6600068226 /* Extension */,
 				D8BB7D732046FEAB00D45B77 /* Resources */,
 				D8BB7D6C2046F6A700D45B77 /* Public */,
 				D8BB7D622046F64E00D45B77 /* Classes */,
@@ -361,6 +372,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8BB7D372046F5FD00D45B77 /* ViewController.swift in Sources */,
+				D80751B3204A8E7400068226 /* UIColor+Util.swift in Sources */,
 				D8BB7D352046F5FD00D45B77 /* AppDelegate.swift in Sources */,
 				D8BB7D702046F78E00D45B77 /* ZZJMultipleImagesContentView.swift in Sources */,
 				D8BB7D6E2046F6B200D45B77 /* common.swift in Sources */,
