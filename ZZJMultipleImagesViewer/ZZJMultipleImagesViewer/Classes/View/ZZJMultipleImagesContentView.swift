@@ -19,14 +19,20 @@ class ZZJMultipleImagesContentView: UIView {
     ///image的数量
     private var imageCount:Int = 0
     
-    ///imageView
-    private var imageView:UIImageView!
+    ///currentImageView
+    private var currentImageView:UIImageView!
     
-    ///oldFrame 保存图片原来的大小
-    private var oldFrame: CGRect!
+    ///currentImageViewOldFrame 图片原来的大小
+    private var currentImageViewOldFrame: CGRect!
     
-    ///largeFrame 确定图片放大最大的程度
-    private var largeFrame: CGRect!
+    ///currentImageViewLargeFrame 图片放大最大的程度
+    private var currentImageViewLargeFrame: CGRect!
+    
+    ///oldFrameArray 保存图片原来的大小的数组
+    private var oldFrameArray = [CGRect]()
+    
+    ///largeFrameArray 保存确定图片放大最大的程度的数组
+    private var largeFrameArray = [CGRect]()
     
     ///currentIndexOfImage 当前是第几张
     private var currentIndexOfImage:Int = 0
@@ -34,12 +40,14 @@ class ZZJMultipleImagesContentView: UIView {
     ///imageViewArray 存放imageView的数组
     private var imageViewArray = [UIImageView]()
     
+    ///isUnderPinchModel 是否正在缩放
+    private var isUnderPinchModel: Bool = false
+    
     init(frame: CGRect, imagesArray:[MultipleImagesModel]) {
         super.init(frame: frame)
         self.imagesArray = imagesArray
         //imageCount
         imageCount = imagesArray.count
-//        imageCount = 1
         createView()
     }
     
@@ -73,23 +81,31 @@ extension ZZJMultipleImagesContentView {
             
             //imageView
             for i in 0..<imageCount {
-                imageView = UIImageView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
-                oldFrame = imageView.frame
-                largeFrame = CGRect(x: -screenWidth, y: -screenHeight, width: oldFrame.size.width * CGFloat(3), height: oldFrame.size.height * CGFloat(3))
+                let imageView = UIImageView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
                 imageView.contentMode = .scaleAspectFit
                 imageView.image = imagesArray[i].image
                 
                 imageView.isUserInteractionEnabled = true
+                imageView.isMultipleTouchEnabled = true
                 self.addPinchGestureRecognizer(view: imageView)
+                self.addPanGestuerRecognizer(view: imageView)
                 imageView.tag = i
                 
                 scrollView.addSubview(imageView)
+                
+                //给相应的数组赋值
                 imageViewArray.append(imageView)
+                oldFrameArray.append(imageView.frame)
+                /*
+                 这里计算图片放大最大的程度，是因为UIImageView是放在UIScrollView上面滚动，所以横坐标的值要从当前图片的前一张的起点算起（若是第一张，就从屏幕外算起）
+                 */
+                let tmpLargeFrame = CGRect(x: screenWidth * CGFloat(i) - screenWidth, y: 0 - screenHeight, width: imageView.frame.size.width * CGFloat(3), height: imageView.frame.size.height * CGFloat(3))
+                largeFrameArray.append(tmpLargeFrame)
             }
         }
     }
     
-    //MARK: 添加单击手势
+    //MARK: - 添加单击手势
     ///添加单击手势
     fileprivate func addTapGestureRecognizer(view: UIView) {
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapAction)))
@@ -109,7 +125,13 @@ extension ZZJMultipleImagesContentView {
         view.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(pinchAction(pinch:))))
     }
     
-    //MARK: 处理单击手势
+    //MARK: 添加移动手势
+    ///添加移动手势
+    fileprivate func addPanGestuerRecognizer(view: UIView) {
+        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(panAction(pan:))))
+    }
+    
+    //MARK: - 处理单击手势
     @objc fileprivate func tapAction() {
         print(#function)
         
@@ -131,12 +153,18 @@ extension ZZJMultipleImagesContentView {
         if pinch.state == .began || pinch.state == .changed {
             view.transform = view.transform.scaledBy(x: pinch.scale, y: pinch.scale)
             
-            if imageView.frame.size.width < oldFrame.size.width {
-                imageView.frame = oldFrame
+            isUnderPinchModel = true
+            
+            currentImageView = imageViewArray[currentIndexOfImage]
+            currentImageViewOldFrame = oldFrameArray[currentIndexOfImage]
+            currentImageViewLargeFrame = largeFrameArray[currentIndexOfImage]
+            
+            if currentImageView.frame.size.width < currentImageViewOldFrame.size.width {
+                currentImageView.frame = currentImageViewOldFrame
             }
             
-            if imageView.frame.size.width > oldFrame.size.width * CGFloat(3) {
-                imageView.frame = largeFrame
+            if currentImageView.frame.size.width > currentImageViewOldFrame.size.width * CGFloat(3) {
+                currentImageView.frame = currentImageViewLargeFrame
             }
             
             pinch.scale = 1
@@ -145,7 +173,18 @@ extension ZZJMultipleImagesContentView {
         
     }
     
-    //MARK: 展示图片查看器
+    //MARK: 处理移动手势
+    @objc fileprivate func panAction(pan: UIPanGestureRecognizer) {
+        
+        guard let view = pan.view else { return }
+        if pan.state == .began || pan.state == .changed {
+            let translation = pan.translation(in: view.superview)
+            view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y + translation.y)
+            pan.setTranslation(.zero, in: view.superview)
+        }
+    }
+    
+    //MARK: - 展示图片查看器
     func showInView(view: UIView?) {
         if view == nil {
             return
