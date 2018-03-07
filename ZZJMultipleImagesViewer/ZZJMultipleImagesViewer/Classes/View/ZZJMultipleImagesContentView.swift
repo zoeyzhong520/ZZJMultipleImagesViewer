@@ -88,7 +88,6 @@ extension ZZJMultipleImagesContentView {
                 imageView.isUserInteractionEnabled = true
                 imageView.isMultipleTouchEnabled = true
                 self.addPinchGestureRecognizer(view: imageView)
-                self.addPanGestuerRecognizer(view: imageView)
                 imageView.tag = i
                 
                 scrollView.addSubview(imageView)
@@ -131,6 +130,17 @@ extension ZZJMultipleImagesContentView {
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(panAction(pan:))))
     }
     
+    ///移除移动手势
+    fileprivate func minusPanGestureRecognizer(view: UIView) {
+        view.gestureRecognizers?.forEach({ (gesture) in
+            if gesture == UIPanGestureRecognizer() {
+                view.removeGestureRecognizer(gesture)
+            }
+        })
+        
+        print(view.gestureRecognizers)
+    }
+    
     //MARK: - 处理单击手势
     @objc fileprivate func tapAction() {
         print(#function)
@@ -147,17 +157,24 @@ extension ZZJMultipleImagesContentView {
     
     //MARK: 处理缩放手势
     @objc fileprivate func pinchAction(pinch: UIPinchGestureRecognizer) {
-        print(#function)
+//        print(#function)
         
         guard let view = pinch.view else { return }
         if pinch.state == .began || pinch.state == .changed {
-            view.transform = view.transform.scaledBy(x: pinch.scale, y: pinch.scale)
             
+            //禁止UIScrollView滚动
+            scrollView.isScrollEnabled = false
+            
+            //设置正在缩放状态
             isUnderPinchModel = true
+            
+            view.transform = view.transform.scaledBy(x: pinch.scale, y: pinch.scale)
             
             currentImageView = imageViewArray[currentIndexOfImage]
             currentImageViewOldFrame = oldFrameArray[currentIndexOfImage]
             currentImageViewLargeFrame = largeFrameArray[currentIndexOfImage]
+            
+//            self.addPanGestuerRecognizer(view: currentImageView)
             
             if currentImageView.frame.size.width < currentImageViewOldFrame.size.width {
                 currentImageView.frame = currentImageViewOldFrame
@@ -167,10 +184,17 @@ extension ZZJMultipleImagesContentView {
                 currentImageView.frame = currentImageViewLargeFrame
             }
             
+            if currentImageView.frame.size.width == currentImageViewOldFrame.size.width {
+                //恢复UIScrollView滚动
+                scrollView.isScrollEnabled = true
+                
+                //取消正在缩放状态
+                isUnderPinchModel = false
+                
+                self.minusPanGestureRecognizer(view: currentImageView)
+            }
             pinch.scale = 1
-            
         }
-        
     }
     
     //MARK: 处理移动手势
