@@ -29,6 +29,7 @@ extension MultipleImagesViewController {
         self.navigationController?.navigationBar.isHidden = true
         title = "多图查看器"
         setButtons()
+        setImageView()
     }
     
     ///set UIButton 设置按钮
@@ -42,9 +43,17 @@ extension MultipleImagesViewController {
         view.addSubview(button)
     }
     
+    ///set UIImageView
+    fileprivate func setImageView() {
+        let imageView = UIImageView(frame: CGRect(x: 0, y: (screenHeight - 100) / 2 + 130, width: screenWidth, height: screenWidth * 0.618))
+        imageView.image = UIImage(named: "1.jpg")
+        imageView.contentMode = .scaleAspectFit
+        view.addSubview(imageView)
+    }
+    
     ///buttonAction
     @objc fileprivate func buttonAction() {
-        print(#function)
+        DebugPrint(message: #function)
         setZZJMultipleImagesContentView()
     }
     

@@ -41,6 +41,14 @@ let HexColorAlpha: (String, CGFloat) -> UIColor = {
     UIColor.colorWithHexString(color: hexString, alpha: alpha)
 }
 
+///Debug模式下打印日志
+func DebugPrint<T>(message: T, file: String = #file, funciton: String = #function, line: Int = #line) {
+    #if DEBUG
+        let fileName = (file as NSString).lastPathComponent
+        print("\(fileName):\(line) \(funciton) | \(message)")
+    #endif
+}
+
 
 
 

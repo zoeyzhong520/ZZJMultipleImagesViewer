@@ -19,29 +19,23 @@ class ZZJMultipleImagesContentView: UIView {
     ///image的数量
     private var imageCount:Int = 0
     
-    ///currentImageView
-    private var currentImageView:UIImageView!
-    
-    ///currentImageViewOldFrame 图片原来的大小
-    private var currentImageViewOldFrame: CGRect!
-    
-    ///currentImageViewLargeFrame 图片放大最大的程度
-    private var currentImageViewLargeFrame: CGRect!
-    
-    ///oldFrameArray 保存图片原来的大小的数组
-    private var oldFrameArray = [CGRect]()
-    
-    ///largeFrameArray 保存确定图片放大最大的程度的数组
-    private var largeFrameArray = [CGRect]()
-    
     ///currentIndexOfImage 当前是第几张
     private var currentIndexOfImage:Int = 0
     
     ///imageViewArray 存放imageView的数组
     private var imageViewArray = [UIImageView]()
     
-    ///isUnderPinchModel 是否正在缩放
-    private var isUnderPinchModel: Bool = false
+    ///scrollViewArray 存放scrollView的数组
+    private var scrollViewArray = [UIScrollView]()
+    
+    ///UIScrollView 滚动偏移量
+    private var lastContentOffset:CGPoint!
+    
+    ///isMaxScale 是否放大到最大限度
+    private var isMaxScale = false
+    
+    ///maxScale 放大的最大限度
+    private var maxScale:CGFloat = 2.0
     
     init(frame: CGRect, imagesArray:[MultipleImagesModel]) {
         super.init(frame: frame)
@@ -65,7 +59,7 @@ extension ZZJMultipleImagesContentView {
         self.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
         
         if scrollView == nil {
-            print("imagesArray: \(imagesArray)")
+            DebugPrint(message: "imagesArray: \(imagesArray)")
             //scrollView
             scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
             scrollView.backgroundColor = UIColor.black
@@ -73,7 +67,6 @@ extension ZZJMultipleImagesContentView {
             scrollView.isPagingEnabled = true
             scrollView.delegate = self
             
-            self.addTapGestureRecognizer(view: scrollView)
 //            self.addSwipeGestureRecognizer(view: scrollView)
             
             addSubview(scrollView)
@@ -81,36 +74,51 @@ extension ZZJMultipleImagesContentView {
             
             //imageView
             for i in 0..<imageCount {
-                let imageView = UIImageView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
+                let bgScrollView = UIScrollView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
+                bgScrollView.delegate = self
+                bgScrollView.maximumZoomScale = maxScale
+                bgScrollView.minimumZoomScale = 1
+                scrollView.addSubview(bgScrollView)
+                
+                let imageView = UIImageView(frame: bgScrollView.bounds)
                 imageView.contentMode = .scaleAspectFit
                 imageView.image = imagesArray[i].image
                 
                 imageView.isUserInteractionEnabled = true
                 imageView.isMultipleTouchEnabled = true
-                self.addPinchGestureRecognizer(view: imageView)
                 imageView.tag = i
+                self.addTapGestureRecognizer(view: imageView)
+                bgScrollView.addSubview(imageView)
                 
-                scrollView.addSubview(imageView)
+                guard let image = imageView.image else { return }
+                
+                if i > 0 {
+                    //设置UIScrollView的滚动范围和图片的真实尺寸一致
+                    bgScrollView.contentSize = CGSize(width: image.size.width, height: 0)
+                }
                 
                 //给相应的数组赋值
                 imageViewArray.append(imageView)
-                oldFrameArray.append(imageView.frame)
-                /*
-                 这里计算图片放大最大的程度，是因为UIImageView是放在UIScrollView上面滚动，所以横坐标的值要从当前图片的前一张的起点算起（若是第一张，就从屏幕外算起）
-                 */
-                let tmpLargeFrame = CGRect(x: screenWidth * CGFloat(i) - screenWidth, y: 0 - screenHeight, width: imageView.frame.size.width * CGFloat(3), height: imageView.frame.size.height * CGFloat(3))
-                largeFrameArray.append(tmpLargeFrame)
+                scrollViewArray.append(bgScrollView)
             }
         }
     }
     
-    //MARK: - 添加单击手势
+    //MARK: - 添加手势
     ///添加单击手势
     fileprivate func addTapGestureRecognizer(view: UIView) {
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapAction)))
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
+        singleTap.numberOfTapsRequired = 1
+        view.addGestureRecognizer(singleTap)
+        
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction))
+        doubleTap.numberOfTapsRequired = 2
+        view.addGestureRecognizer(doubleTap)
+        
+        //只有当doubleTapGesture识别失败的时候(即识别出这不是双击操作)，singleTapGesture才能开始识别
+        singleTap.require(toFail: doubleTap)
     }
     
-    //MARK: 添加下滑手势
     ///添加下滑手势
     fileprivate func addSwipeGestureRecognizer(view: UIView) {
         let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swipeDownAction))
@@ -118,93 +126,28 @@ extension ZZJMultipleImagesContentView {
         view.addGestureRecognizer(swipe)
     }
     
-    //MARK: 添加缩放手势
-    ///添加缩放手势
-    fileprivate func addPinchGestureRecognizer(view: UIView) {
-        view.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(pinchAction(pinch:))))
-    }
-    
-    //MARK: 添加移动手势
-    ///添加移动手势
-    fileprivate func addPanGestuerRecognizer(view: UIView) {
-        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(panAction(pan:))))
-    }
-    
-    ///移除移动手势
-    fileprivate func minusPanGestureRecognizer(view: UIView) {
-        view.gestureRecognizers?.forEach({ (gesture) in
-            if gesture == UIPanGestureRecognizer() {
-                view.removeGestureRecognizer(gesture)
-            }
-        })
-        
-        print(view.gestureRecognizers)
-    }
-    
-    //MARK: - 处理单击手势
+    //MARK: - 处理手势
     @objc fileprivate func tapAction() {
-        print(#function)
+        DebugPrint(message: #function)
         
         disMissView()
     }
     
-    //MARK: 处理下滑手势
     @objc fileprivate func swipeDownAction() {
-        print(#function)
+        DebugPrint(message: #function)
         
         disMissView()
     }
     
-    //MARK: 处理缩放手势
-    @objc fileprivate func pinchAction(pinch: UIPinchGestureRecognizer) {
-//        print(#function)
+    @objc fileprivate func doubleTapAction() {
+        DebugPrint(message: #function)
         
-        guard let view = pinch.view else { return }
-        if pinch.state == .began || pinch.state == .changed {
-            
-            //禁止UIScrollView滚动
-            scrollView.isScrollEnabled = false
-            
-            //设置正在缩放状态
-            isUnderPinchModel = true
-            
-            view.transform = view.transform.scaledBy(x: pinch.scale, y: pinch.scale)
-            
-            currentImageView = imageViewArray[currentIndexOfImage]
-            currentImageViewOldFrame = oldFrameArray[currentIndexOfImage]
-            currentImageViewLargeFrame = largeFrameArray[currentIndexOfImage]
-            
-//            self.addPanGestuerRecognizer(view: currentImageView)
-            
-            if currentImageView.frame.size.width < currentImageViewOldFrame.size.width {
-                currentImageView.frame = currentImageViewOldFrame
-            }
-            
-            if currentImageView.frame.size.width > currentImageViewOldFrame.size.width * CGFloat(3) {
-                currentImageView.frame = currentImageViewLargeFrame
-            }
-            
-            if currentImageView.frame.size.width == currentImageViewOldFrame.size.width {
-                //恢复UIScrollView滚动
-                scrollView.isScrollEnabled = true
-                
-                //取消正在缩放状态
-                isUnderPinchModel = false
-                
-                self.minusPanGestureRecognizer(view: currentImageView)
-            }
-            pinch.scale = 1
-        }
-    }
-    
-    //MARK: 处理移动手势
-    @objc fileprivate func panAction(pan: UIPanGestureRecognizer) {
-        
-        guard let view = pan.view else { return }
-        if pan.state == .began || pan.state == .changed {
-            let translation = pan.translation(in: view.superview)
-            view.center = CGPoint(x: view.center.x + translation.x, y: view.center.y + translation.y)
-            pan.setTranslation(.zero, in: view.superview)
+        if !isMaxScale {
+            isMaxScale = true
+            scrollViewArray[currentIndexOfImage].setZoomScale(maxScale, animated: true)
+        } else {
+            isMaxScale = false
+            scrollViewArray[currentIndexOfImage].setZoomScale(1.0, animated: true)
         }
     }
     
@@ -218,7 +161,7 @@ extension ZZJMultipleImagesContentView {
         view?.addSubview(scrollView)
         
         scrollView.alpha = 0.0
-        UIView.animate(withDuration: 0.5, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             self.scrollView.alpha = 1.0
         }, completion: nil)
     }
@@ -226,7 +169,7 @@ extension ZZJMultipleImagesContentView {
     //MARK: 隐藏图片查看器
     fileprivate func disMissView() {
         scrollView.alpha = 1.0
-        UIView.animate(withDuration: 0.5, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             self.scrollView.alpha = 0.0
         }) { (finished) in
             self.removeFromSuperview()
@@ -239,28 +182,75 @@ extension ZZJMultipleImagesContentView {
 extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        print(#function)
+        DebugPrint(message: #function)
+        if scrollView == self.scrollView {
+            lastContentOffset = scrollView.contentOffset
+        }
     }
     
     func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-        print(#function)
+        DebugPrint(message: #function)
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        print(#function)
+        DebugPrint(message: #function)
         
-        //currentIndexOfImage
-        currentIndexOfImage = Int(scrollView.contentOffset.x / screenWidth)
-        print("当前是第\(currentIndexOfImage+1)张图片～")
+        if scrollView == self.scrollView {
+            //currentIndexOfImage
+            currentIndexOfImage = Int(scrollView.contentOffset.x / screenWidth)
+            DebugPrint(message: "当前是第\(currentIndexOfImage+1)张图片～")
+            scrollViewArray[currentIndexOfImage].setZoomScale(1.0, animated: true)
+            isMaxScale = false
+        }
+        
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        print(#function)
+        
+        if scrollView == scrollViewArray[currentIndexOfImage] {
+            
+//            let offSet = scrollView.contentOffset
+//            DebugPrint(message: "offSet: \(offSet)")
+//            DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
+            
+        } else if scrollView == self.scrollView {
+            
+            let offSet = scrollView.contentOffset
+            DebugPrint(message: "offSet: \(offSet)")
+            DebugPrint(message: "lastContentOffset: \(lastContentOffset)")
+            
+            if lastContentOffset == nil {
+                return
+            }
+            
+            if lastContentOffset.x < offSet.x {
+                //向左滑动
+                DebugPrint(message: "向左滑动")
+                
+                
+            } else {
+                //向右滑动
+                DebugPrint(message: "向右滑动")
+                
+                
+            }
+        }
         
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        print(#function)
+        DebugPrint(message: #function)
+    }
+    
+    //代理方法，告诉ScrollView要缩放的是哪个视图
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imageViewArray[currentIndexOfImage]
+    }
+    
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+        if scrollView == scrollViewArray[currentIndexOfImage] {
+            scrollView.setZoomScale(scale, animated: true)
+        }
     }
 }
 

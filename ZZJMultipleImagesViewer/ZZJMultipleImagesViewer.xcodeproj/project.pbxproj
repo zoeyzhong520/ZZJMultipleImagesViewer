@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D80751B3204A8E7400068226 /* UIColor+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80751B2204A8E7400068226 /* UIColor+Util.swift */; };
+		D8428AE2205108EA002C947B /* ZZJImageZoomView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8428AE1205108EA002C947B /* ZZJImageZoomView.m */; };
 		D8BB7D352046F5FD00D45B77 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BB7D342046F5FD00D45B77 /* AppDelegate.swift */; };
 		D8BB7D372046F5FD00D45B77 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BB7D362046F5FD00D45B77 /* ViewController.swift */; };
 		D8BB7D3A2046F5FD00D45B77 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8BB7D382046F5FD00D45B77 /* Main.storyboard */; };
@@ -49,6 +50,9 @@
 
 /* Begin PBXFileReference section */
 		D80751B2204A8E7400068226 /* UIColor+Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Util.swift"; sourceTree = "<group>"; };
+		D8428ADB205108C3002C947B /* ZZJMultipleImagesViewer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZZJMultipleImagesViewer-Bridging-Header.h"; sourceTree = "<group>"; };
+		D8428AE0205108EA002C947B /* ZZJImageZoomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZZJImageZoomView.h; sourceTree = "<group>"; };
+		D8428AE1205108EA002C947B /* ZZJImageZoomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZZJImageZoomView.m; sourceTree = "<group>"; };
 		D8BB7D312046F5FD00D45B77 /* ZZJMultipleImagesViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZZJMultipleImagesViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8BB7D342046F5FD00D45B77 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D8BB7D362046F5FD00D45B77 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -110,6 +114,15 @@
 			path = Extension;
 			sourceTree = "<group>";
 		};
+		D8428ADF205108EA002C947B /* ZZJImageZoomView */ = {
+			isa = PBXGroup;
+			children = (
+				D8428AE0205108EA002C947B /* ZZJImageZoomView.h */,
+				D8428AE1205108EA002C947B /* ZZJImageZoomView.m */,
+			);
+			path = ZZJImageZoomView;
+			sourceTree = "<group>";
+		};
 		D8BB7D282046F5FD00D45B77 = {
 			isa = PBXGroup;
 			children = (
@@ -143,6 +156,7 @@
 				D8BB7D3B2046F5FD00D45B77 /* Assets.xcassets */,
 				D8BB7D3D2046F5FD00D45B77 /* LaunchScreen.storyboard */,
 				D8BB7D402046F5FD00D45B77 /* Info.plist */,
+				D8428ADB205108C3002C947B /* ZZJMultipleImagesViewer-Bridging-Header.h */,
 			);
 			path = ZZJMultipleImagesViewer;
 			sourceTree = "<group>";
@@ -205,6 +219,7 @@
 		D8BB7D6C2046F6A700D45B77 /* Public */ = {
 			isa = PBXGroup;
 			children = (
+				D8428ADF205108EA002C947B /* ZZJImageZoomView */,
 				D8BB7D6D2046F6B200D45B77 /* common.swift */,
 			);
 			path = Public;
@@ -299,6 +314,7 @@
 				TargetAttributes = {
 					D8BB7D302046F5FD00D45B77 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 					D8BB7D442046F5FD00D45B77 = {
@@ -380,6 +396,7 @@
 				D8BB7D692046F67400D45B77 /* BaseModel.swift in Sources */,
 				D8BB7D672046F66500D45B77 /* BaseViewController.swift in Sources */,
 				D8BB7D822046FF0100D45B77 /* MultipleImagesViewController.swift in Sources */,
+				D8428AE2205108EA002C947B /* ZZJImageZoomView.m in Sources */,
 				D8BB7D722046F83200D45B77 /* MultipleImagesModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -546,13 +563,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UC4NK3U5ML;
+				DEVELOPMENT_TEAM = HHBWV8ZU9T;
 				INFOPLIST_FILE = ZZJMultipleImagesViewer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.zzj.ZZJMultipleImagesViewer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hy.ZZJMultipleImagesViewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ZZJMultipleImagesViewer/ZZJMultipleImagesViewer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -562,13 +582,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UC4NK3U5ML;
+				DEVELOPMENT_TEAM = HHBWV8ZU9T;
 				INFOPLIST_FILE = ZZJMultipleImagesViewer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.zzj.ZZJMultipleImagesViewer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hy.ZZJMultipleImagesViewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ZZJMultipleImagesViewer/ZZJMultipleImagesViewer-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
