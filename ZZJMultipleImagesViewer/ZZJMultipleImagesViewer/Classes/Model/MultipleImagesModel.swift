@@ -11,11 +11,13 @@ import UIKit
 class MultipleImagesModel: NSObject {
 
     var image:UIImage?
+    var url:String?
     
     ///创建model的方法
-    class func createModel(image: UIImage?) -> MultipleImagesModel {
+    class func createModel(image: UIImage?, url: String?) -> MultipleImagesModel {
         let model = MultipleImagesModel()
         model.image = image
+        model.url = url
         return model
     }
 }

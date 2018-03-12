@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class ZZJMultipleImagesContentView: UIView {
 
@@ -37,17 +38,22 @@ class ZZJMultipleImagesContentView: UIView {
     ///maxScale 放大的最大限度
     private var maxScale:CGFloat = 2.0
     
+    ///minScale 缩小的最大限度
+    private var minScale:CGFloat = 1.0
+    
     init(frame: CGRect, imagesArray:[MultipleImagesModel]) {
         super.init(frame: frame)
         self.imagesArray = imagesArray
         //imageCount
         imageCount = imagesArray.count
+        currentIndexOfImage = 0
         createView()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }
 
 extension ZZJMultipleImagesContentView {
@@ -66,8 +72,8 @@ extension ZZJMultipleImagesContentView {
             scrollView.isUserInteractionEnabled = true
             scrollView.isPagingEnabled = true
             scrollView.delegate = self
-            
-//            self.addSwipeGestureRecognizer(view: scrollView)
+            scrollView.bounces = false
+            scrollView.isDirectionalLockEnabled = true
             
             addSubview(scrollView)
             scrollView.contentSize = CGSize(width: screenWidth * CGFloat(imageCount), height: screenHeight)
@@ -77,24 +83,32 @@ extension ZZJMultipleImagesContentView {
                 let bgScrollView = UIScrollView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
                 bgScrollView.delegate = self
                 bgScrollView.maximumZoomScale = maxScale
-                bgScrollView.minimumZoomScale = 1
+                bgScrollView.minimumZoomScale = minScale
                 scrollView.addSubview(bgScrollView)
                 
                 let imageView = UIImageView(frame: bgScrollView.bounds)
                 imageView.contentMode = .scaleAspectFit
-                imageView.image = imagesArray[i].image
+                
+                if imagesArray[i].url == nil {
+                    imageView.image = imagesArray[i].image //本地图片
+                } else {
+                    let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
+                    let placeHolderImg = UIImage(named: "banner_defaultImg")
+                    imageView.kf.setImage(with: urlString, placeholder: placeHolderImg)
+                }
                 
                 imageView.isUserInteractionEnabled = true
                 imageView.isMultipleTouchEnabled = true
                 imageView.tag = i
                 self.addTapGestureRecognizer(view: imageView)
+                self.addSwipeGestureRecognizer(view: imageView)
                 bgScrollView.addSubview(imageView)
                 
                 guard let image = imageView.image else { return }
                 
                 if i > 0 {
                     //设置UIScrollView的滚动范围和图片的真实尺寸一致
-                    bgScrollView.contentSize = CGSize(width: image.size.width, height: 0)
+                    bgScrollView.contentSize = image.size
                 }
                 
                 //给相应的数组赋值
@@ -111,7 +125,7 @@ extension ZZJMultipleImagesContentView {
         singleTap.numberOfTapsRequired = 1
         view.addGestureRecognizer(singleTap)
         
-        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction))
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction(gesture:)))
         doubleTap.numberOfTapsRequired = 2
         view.addGestureRecognizer(doubleTap)
         
@@ -139,15 +153,17 @@ extension ZZJMultipleImagesContentView {
         disMissView()
     }
     
-    @objc fileprivate func doubleTapAction() {
+    @objc fileprivate func doubleTapAction(gesture:UIGestureRecognizer) {
         DebugPrint(message: #function)
         
         if !isMaxScale {
             isMaxScale = true
-            scrollViewArray[currentIndexOfImage].setZoomScale(maxScale, animated: true)
+            let newScale = scrollViewArray[currentIndexOfImage].zoomScale * 1.5
+            let zoomRect = self.zoomRectForScale(scale: newScale, center: gesture.location(in: gesture.view))
+            scrollViewArray[currentIndexOfImage].zoom(to: zoomRect, animated: true)
         } else {
             isMaxScale = false
-            scrollViewArray[currentIndexOfImage].setZoomScale(1.0, animated: true)
+            scrollViewArray[currentIndexOfImage].setZoomScale(minScale, animated: true)
         }
     }
     
@@ -160,8 +176,10 @@ extension ZZJMultipleImagesContentView {
         view?.addSubview(self)
         view?.addSubview(scrollView)
         
+        scrollView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)//缩放效果
         scrollView.alpha = 0.0
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: 0.4, animations: {
+            self.scrollView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)//还原原始尺寸
             self.scrollView.alpha = 1.0
         }, completion: nil)
     }
@@ -169,8 +187,9 @@ extension ZZJMultipleImagesContentView {
     //MARK: 隐藏图片查看器
     fileprivate func disMissView() {
         scrollView.alpha = 1.0
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: 0.4, animations: {
             self.scrollView.alpha = 0.0
+            self.scrollView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
         }) { (finished) in
             self.removeFromSuperview()
             self.scrollView.removeFromSuperview()
@@ -199,7 +218,7 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
             //currentIndexOfImage
             currentIndexOfImage = Int(scrollView.contentOffset.x / screenWidth)
             DebugPrint(message: "当前是第\(currentIndexOfImage+1)张图片～")
-            scrollViewArray[currentIndexOfImage].setZoomScale(1.0, animated: true)
+            scrollViewArray[currentIndexOfImage].setZoomScale(minScale, animated: true)
             isMaxScale = false
         }
         
@@ -209,9 +228,12 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
         
         if scrollView == scrollViewArray[currentIndexOfImage] {
             
-//            let offSet = scrollView.contentOffset
-//            DebugPrint(message: "offSet: \(offSet)")
-//            DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
+            let offSet = scrollView.contentOffset
+            DebugPrint(message: "offSet: \(offSet)")
+            DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
+            let difference = offSet.y - screenHeight
+            DebugPrint(message: "difference: \(difference)")
+            
             
         } else if scrollView == self.scrollView {
             
@@ -252,9 +274,32 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
             scrollView.setZoomScale(scale, animated: true)
         }
     }
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        
+        if scrollView == scrollViewArray[currentIndexOfImage] {
+            let curImgView = imageViewArray[currentIndexOfImage]
+            let offSetX = (scrollView.bounds.size.width > scrollView.contentSize.width) ? (scrollView.bounds.size.width - scrollView.contentSize.width) / 2 : 0.0
+            let offSetY = (scrollView.bounds.size.height > scrollView.contentSize.height) ? (scrollView.bounds.size.height - scrollView.contentSize.height) / 2 : 0.0
+            curImgView.center = CGPoint(x: scrollView.contentSize.width / 2 + offSetX, y: scrollView.contentSize.height / 2 + offSetY)
+        }
+    }
 }
 
-
+extension ZZJMultipleImagesContentView {
+    
+    ///zoomRectForScale
+    fileprivate func zoomRectForScale(scale: CGFloat, center: CGPoint) -> CGRect {
+        
+        var zoomRect:CGRect = CGRect(x: 0, y: 0, width: 0, height: 0)
+        let curScrollView = scrollViewArray[currentIndexOfImage]
+        zoomRect.size.height = curScrollView.frame.size.height / scale
+        zoomRect.size.width = curScrollView.frame.size.width / scale
+        zoomRect.origin.x = center.x - (zoomRect.size.width / 2)
+        zoomRect.origin.y = center.y - (zoomRect.size.height / 2)
+        return zoomRect
+    }
+}
 
 
 

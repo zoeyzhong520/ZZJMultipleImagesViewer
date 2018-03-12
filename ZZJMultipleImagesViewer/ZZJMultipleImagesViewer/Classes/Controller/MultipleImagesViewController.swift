@@ -62,7 +62,7 @@ extension MultipleImagesViewController {
         
         var imagesArray = [MultipleImagesModel]()
         for i in 0..<6 {
-            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"))
+            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"), url: nil)
             imagesArray.append(model)
         }
         
