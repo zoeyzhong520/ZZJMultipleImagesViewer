@@ -41,6 +41,16 @@ class ZZJMultipleImagesContentView: UIView {
     ///minScale 缩小的最大限度
     private var minScale:CGFloat = 1.0
     
+    ///UIActivityIndicatorView
+    fileprivate lazy var indicatorView:UIActivityIndicatorView = {
+        let indicatorView = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        indicatorView.activityIndicatorViewStyle = .gray
+        indicatorView.activityIndicatorViewStyle = .whiteLarge
+//        indicatorView.backgroundColor = UIColor.lightGray
+        indicatorView.center = self.center
+        return indicatorView
+    }()
+    
     init(frame: CGRect, imagesArray:[MultipleImagesModel]) {
         super.init(frame: frame)
         self.imagesArray = imagesArray
@@ -84,72 +94,45 @@ extension ZZJMultipleImagesContentView {
     
     ///config imageViewArray && scrollViewArray
     fileprivate func configArray() {
-        if imageCount == 1 {
-            let bgScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
+        
+        //imageView
+        for i in 0..<imageCount {
+            let bgScrollView = UIScrollView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
             bgScrollView.delegate = self
             bgScrollView.maximumZoomScale = maxScale
             bgScrollView.minimumZoomScale = minScale
             scrollView.addSubview(bgScrollView)
             
             let imageView = UIImageView(frame: bgScrollView.bounds)
-            
-            if imagesArray.first?.url == nil {
-                imageView.image = imagesArray.first?.image //本地图片
-            } else {
-                let urlString = URL(string: imagesArray.first?.url == nil ? "" : (imagesArray.first?.url)!)
-                let placeHolderImg = UIImage(named: "banner_defaultImg")
-                imageView.kf.setImage(with: urlString)
-            }
-            
             imageView.contentMode = .scaleAspectFit
             imageView.isUserInteractionEnabled = true
             imageView.isMultipleTouchEnabled = true
-            imageView.clipsToBounds = true
+            imageView.tag = i
             self.addTapGestureRecognizer(view: imageView)
             self.addSwipeGestureRecognizer(view: imageView)
             bgScrollView.addSubview(imageView)
+            imageView.addSubview(indicatorView)
+            
+            if imagesArray[i].url == nil {
+                imageView.image = imagesArray[i].image //本地图片
+            } else {
+                let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
+                imageView.kf.setImage(with: urlString, progressBlock: { (receivedSize, totalSize) in
+                    self.indicatorView.startAnimating()
+                }, completionHandler: { (image, error, cacheType, imageUrl) in
+                    self.indicatorView.stopAnimating()
+                })
+            }
             
             //给相应的数组赋值
             imageViewArray.append(imageView)
             scrollViewArray.append(bgScrollView)
-        } else {
-            //imageView
-            for i in 0..<imageCount {
-                let bgScrollView = UIScrollView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
-                bgScrollView.delegate = self
-                bgScrollView.maximumZoomScale = maxScale
-                bgScrollView.minimumZoomScale = minScale
-                scrollView.addSubview(bgScrollView)
-                
-                let imageView = UIImageView(frame: bgScrollView.bounds)
-                imageView.contentMode = .scaleAspectFit
-                
-                if imagesArray[i].url == nil {
-                    imageView.image = imagesArray[i].image //本地图片
-                } else {
-                    let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
-                    //                    let placeHolderImg = UIImage(named: "banner_defaultImg")
-                    //                    imageView.kf.setImage(with: urlString, placeholder: placeHolderImg)
-                    imageView.kf.setImage(with: urlString)
-                }
-                
-                imageView.isUserInteractionEnabled = true
-                imageView.isMultipleTouchEnabled = true
-                imageView.tag = i
-                self.addTapGestureRecognizer(view: imageView)
-                self.addSwipeGestureRecognizer(view: imageView)
-                bgScrollView.addSubview(imageView)
-                
-                guard let image = imageView.image else { return }
-                
+            
+            if let image = imageView.image {
                 if i > 0 {
                     //设置UIScrollView的滚动范围和图片的真实尺寸一致
                     bgScrollView.contentSize = image.size
                 }
-                
-                //给相应的数组赋值
-                imageViewArray.append(imageView)
-                scrollViewArray.append(bgScrollView)
             }
         }
     }
@@ -194,13 +177,10 @@ extension ZZJMultipleImagesContentView {
         
         if !isMaxScale {
             isMaxScale = true
-            if scrollViewArray.count == 0 {
-                scrollViewArray[currentIndexOfImage].setZoomScale(maxScale, animated: true)
-            } else {
-                let newScale = scrollViewArray[currentIndexOfImage].zoomScale * 1.5
-                let zoomRect = self.zoomRectForScale(scale: newScale, center: gesture.location(in: gesture.view))
-                scrollViewArray[currentIndexOfImage].zoom(to: zoomRect, animated: true)
-            }
+            
+            let newScale = scrollViewArray[currentIndexOfImage].zoomScale * 1.5
+            let zoomRect = self.zoomRectForScale(scale: newScale, center: gesture.location(in: gesture.view))
+            scrollViewArray[currentIndexOfImage].zoom(to: zoomRect, animated: true)
             
         } else {
             isMaxScale = false
@@ -232,6 +212,7 @@ extension ZZJMultipleImagesContentView {
             self.scrollView.alpha = 0.0
             self.scrollView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
         }) { (finished) in
+            self.indicatorView.stopAnimating()
             self.removeFromSuperview()
             self.scrollView.removeFromSuperview()
         }

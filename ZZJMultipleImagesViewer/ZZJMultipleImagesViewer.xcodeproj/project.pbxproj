@@ -12,6 +12,7 @@
 		D8428AE2205108EA002C947B /* ZZJImageZoomView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8428AE1205108EA002C947B /* ZZJImageZoomView.m */; };
 		D8A32EE4205647B300028AFE /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80A5896205644B300645AD8 /* Kingfisher.framework */; };
 		D8A32EE5205647B300028AFE /* Kingfisher.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D80A5896205644B300645AD8 /* Kingfisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D8A42E5E2056BCA4005D9CBD /* ZZJProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A42E5D2056BCA4005D9CBD /* ZZJProgressHUD.swift */; };
 		D8BB7D352046F5FD00D45B77 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BB7D342046F5FD00D45B77 /* AppDelegate.swift */; };
 		D8BB7D372046F5FD00D45B77 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8BB7D362046F5FD00D45B77 /* ViewController.swift */; };
 		D8BB7D3A2046F5FD00D45B77 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8BB7D382046F5FD00D45B77 /* Main.storyboard */; };
@@ -134,6 +135,7 @@
 		D8428ADB205108C3002C947B /* ZZJMultipleImagesViewer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZZJMultipleImagesViewer-Bridging-Header.h"; sourceTree = "<group>"; };
 		D8428AE0205108EA002C947B /* ZZJImageZoomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZZJImageZoomView.h; sourceTree = "<group>"; };
 		D8428AE1205108EA002C947B /* ZZJImageZoomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZZJImageZoomView.m; sourceTree = "<group>"; };
+		D8A42E5D2056BCA4005D9CBD /* ZZJProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZZJProgressHUD.swift; sourceTree = "<group>"; };
 		D8BB7D312046F5FD00D45B77 /* ZZJMultipleImagesViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZZJMultipleImagesViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8BB7D342046F5FD00D45B77 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D8BB7D362046F5FD00D45B77 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 			children = (
 				D8BB7D6A2046F67F00D45B77 /* BaseView.swift */,
 				D8BB7D6F2046F78E00D45B77 /* ZZJMultipleImagesContentView.swift */,
+				D8A42E5D2056BCA4005D9CBD /* ZZJProgressHUD.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -557,6 +560,7 @@
 				D8BB7D372046F5FD00D45B77 /* ViewController.swift in Sources */,
 				D80751B3204A8E7400068226 /* UIColor+Util.swift in Sources */,
 				D8BB7D352046F5FD00D45B77 /* AppDelegate.swift in Sources */,
+				D8A42E5E2056BCA4005D9CBD /* ZZJProgressHUD.swift in Sources */,
 				D8BB7D702046F78E00D45B77 /* ZZJMultipleImagesContentView.swift in Sources */,
 				D8BB7D6E2046F6B200D45B77 /* common.swift in Sources */,
 				D8BB7D6B2046F67F00D45B77 /* BaseView.swift in Sources */,

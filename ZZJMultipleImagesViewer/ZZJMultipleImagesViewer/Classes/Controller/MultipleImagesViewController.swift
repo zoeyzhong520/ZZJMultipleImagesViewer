@@ -8,7 +8,13 @@
 
 import UIKit
 
+///imgURLString
+fileprivate let imgURLString = "http://seopic.699pic.com/photo/50036/2893.jpg_wh1200.jpg"
+
 class MultipleImagesViewController: BaseViewController {
+    
+    ///imageURLArray
+    var imageURLArray = ["http://d.5857.com/mac_161029/001.jpg", "http://d.5857.com/mac_161029/002.jpg", "http://d.5857.com/mac_161029/006.jpg", "http://d.5857.com/mac_161029/007.jpg", "http://d.5857.com/mac_161029/009.jpg", "http://d.5857.com/mac_161029/010.jpg", "http://d.5857.com/mac_161029/012.jpg"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +47,7 @@ extension MultipleImagesViewController {
         button.backgroundColor = HexColor("ff99ff")
         button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
         view.addSubview(button)
+        
     }
     
     ///set UIImageView
@@ -61,13 +68,15 @@ extension MultipleImagesViewController {
     fileprivate func setZZJMultipleImagesContentView() {
         
         var imagesArray = [MultipleImagesModel]()
-        for i in 0..<6 {
-            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"), url: nil)
+//        for i in 0..<6 {
+//            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"), url: nil)
+//            imagesArray.append(model)
+//        }
+
+        for i in 0..<imageURLArray.count {
+            let model = MultipleImagesModel.createModel(image: nil, url: imageURLArray[i])
             imagesArray.append(model)
         }
-//        //http://phone.seedu.me/float_img/migu.png
-//        let model = MultipleImagesModel.createModel(image: nil, url: "http://phone.seedu.me/float_img/migu.png")
-//        imagesArray.append(model)
         
         let multipleImagesView = ZZJMultipleImagesContentView(frame: .zero, imagesArray: imagesArray)
         multipleImagesView.showInView(view: ZZJKeyWindow)
