@@ -104,6 +104,7 @@ extension ZZJMultipleImagesContentView {
             imageView.contentMode = .scaleAspectFit
             imageView.isUserInteractionEnabled = true
             imageView.isMultipleTouchEnabled = true
+            imageView.clipsToBounds = true
             self.addTapGestureRecognizer(view: imageView)
             self.addSwipeGestureRecognizer(view: imageView)
             bgScrollView.addSubview(imageView)

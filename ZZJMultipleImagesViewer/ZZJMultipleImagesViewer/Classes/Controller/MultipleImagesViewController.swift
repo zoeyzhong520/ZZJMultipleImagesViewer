@@ -61,13 +61,13 @@ extension MultipleImagesViewController {
     fileprivate func setZZJMultipleImagesContentView() {
         
         var imagesArray = [MultipleImagesModel]()
-//        for i in 0..<6 {
-//            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"), url: nil)
-//            imagesArray.append(model)
-//        }
-        //http://phone.seedu.me/float_img/migu.png
-        let model = MultipleImagesModel.createModel(image: nil, url: "http://phone.seedu.me/float_img/migu.png")
-        imagesArray.append(model)
+        for i in 0..<6 {
+            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"), url: nil)
+            imagesArray.append(model)
+        }
+//        //http://phone.seedu.me/float_img/migu.png
+//        let model = MultipleImagesModel.createModel(image: nil, url: "http://phone.seedu.me/float_img/migu.png")
+//        imagesArray.append(model)
         
         let multipleImagesView = ZZJMultipleImagesContentView(frame: .zero, imagesArray: imagesArray)
         multipleImagesView.showInView(view: ZZJKeyWindow)
