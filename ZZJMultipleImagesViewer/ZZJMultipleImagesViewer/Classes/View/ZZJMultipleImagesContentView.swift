@@ -78,6 +78,40 @@ extension ZZJMultipleImagesContentView {
             addSubview(scrollView)
             scrollView.contentSize = CGSize(width: screenWidth * CGFloat(imageCount), height: screenHeight)
             
+            self.configArray()
+        }
+    }
+    
+    ///config imageViewArray && scrollViewArray
+    fileprivate func configArray() {
+        if imageCount == 1 {
+            let bgScrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
+            bgScrollView.delegate = self
+            bgScrollView.maximumZoomScale = maxScale
+            bgScrollView.minimumZoomScale = minScale
+            scrollView.addSubview(bgScrollView)
+            
+            let imageView = UIImageView(frame: bgScrollView.bounds)
+            
+            if imagesArray.first?.url == nil {
+                imageView.image = imagesArray.first?.image //本地图片
+            } else {
+                let urlString = URL(string: imagesArray.first?.url == nil ? "" : (imagesArray.first?.url)!)
+                let placeHolderImg = UIImage(named: "banner_defaultImg")
+                imageView.kf.setImage(with: urlString)
+            }
+            
+            imageView.contentMode = .scaleAspectFit
+            imageView.isUserInteractionEnabled = true
+            imageView.isMultipleTouchEnabled = true
+            self.addTapGestureRecognizer(view: imageView)
+            self.addSwipeGestureRecognizer(view: imageView)
+            bgScrollView.addSubview(imageView)
+            
+            //给相应的数组赋值
+            imageViewArray.append(imageView)
+            scrollViewArray.append(bgScrollView)
+        } else {
             //imageView
             for i in 0..<imageCount {
                 let bgScrollView = UIScrollView(frame: CGRect(x: screenWidth * CGFloat(i), y: 0, width: screenWidth, height: screenHeight))
@@ -93,8 +127,8 @@ extension ZZJMultipleImagesContentView {
                     imageView.image = imagesArray[i].image //本地图片
                 } else {
                     let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
-//                    let placeHolderImg = UIImage(named: "banner_defaultImg")
-//                    imageView.kf.setImage(with: urlString, placeholder: placeHolderImg)
+                    //                    let placeHolderImg = UIImage(named: "banner_defaultImg")
+                    //                    imageView.kf.setImage(with: urlString, placeholder: placeHolderImg)
                     imageView.kf.setImage(with: urlString)
                 }
                 
@@ -159,9 +193,14 @@ extension ZZJMultipleImagesContentView {
         
         if !isMaxScale {
             isMaxScale = true
-            let newScale = scrollViewArray[currentIndexOfImage].zoomScale * 1.5
-            let zoomRect = self.zoomRectForScale(scale: newScale, center: gesture.location(in: gesture.view))
-            scrollViewArray[currentIndexOfImage].zoom(to: zoomRect, animated: true)
+            if scrollViewArray.count == 0 {
+                scrollViewArray[currentIndexOfImage].setZoomScale(maxScale, animated: true)
+            } else {
+                let newScale = scrollViewArray[currentIndexOfImage].zoomScale * 1.5
+                let zoomRect = self.zoomRectForScale(scale: newScale, center: gesture.location(in: gesture.view))
+                scrollViewArray[currentIndexOfImage].zoom(to: zoomRect, animated: true)
+            }
+            
         } else {
             isMaxScale = false
             scrollViewArray[currentIndexOfImage].setZoomScale(minScale, animated: true)

@@ -65,7 +65,7 @@ extension MultipleImagesViewController {
 //            let model = MultipleImagesModel.createModel(image: UIImage(named: "\(i+1).jpg"), url: nil)
 //            imagesArray.append(model)
 //        }
-        
+        //http://phone.seedu.me/float_img/migu.png
         let model = MultipleImagesModel.createModel(image: nil, url: "http://phone.seedu.me/float_img/migu.png")
         imagesArray.append(model)
         
