@@ -93,8 +93,9 @@ extension ZZJMultipleImagesContentView {
                     imageView.image = imagesArray[i].image //本地图片
                 } else {
                     let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
-                    let placeHolderImg = UIImage(named: "banner_defaultImg")
-                    imageView.kf.setImage(with: urlString, placeholder: placeHolderImg)
+//                    let placeHolderImg = UIImage(named: "banner_defaultImg")
+//                    imageView.kf.setImage(with: urlString, placeholder: placeHolderImg)
+                    imageView.kf.setImage(with: urlString)
                 }
                 
                 imageView.isUserInteractionEnabled = true
