@@ -9,6 +9,11 @@
 import UIKit
 import Kingfisher
 
+enum ImageType: Int {
+    case Net = 0
+    case Local
+}
+
 class ZZJMultipleImagesContentView: UIView {
 
     ///scrollView
@@ -36,7 +41,7 @@ class ZZJMultipleImagesContentView: UIView {
     private var isMaxScale = false
     
     ///maxScale 放大的最大限度
-    private var maxScale:CGFloat = 2.0
+    private var maxScale:CGFloat = 3.0
     
     ///minScale 缩小的最大限度
     private var minScale:CGFloat = 1.0
@@ -78,11 +83,10 @@ extension ZZJMultipleImagesContentView {
             DebugPrint(message: "imagesArray: \(imagesArray)")
             //scrollView
             scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
-            scrollView.backgroundColor = UIColor.black
+            scrollView.backgroundColor = UIColor.white
             scrollView.isUserInteractionEnabled = true
             scrollView.isPagingEnabled = true
             scrollView.delegate = self
-            scrollView.bounces = false
             scrollView.isDirectionalLockEnabled = true
             
             addSubview(scrollView)
@@ -113,27 +117,30 @@ extension ZZJMultipleImagesContentView {
             bgScrollView.addSubview(imageView)
             imageView.addSubview(indicatorView)
             
-            if imagesArray[i].url == nil {
-                imageView.image = imagesArray[i].image //本地图片
-            } else {
-                let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
-                imageView.kf.setImage(with: urlString, progressBlock: { (receivedSize, totalSize) in
-                    self.indicatorView.startAnimating()
-                }, completionHandler: { (image, error, cacheType, imageUrl) in
-                    self.indicatorView.stopAnimating()
-                })
+            if let imageType = imagesArray[i].imageType {
+                switch imageType {
+                case .Net:
+                    let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
+                    imageView.kf.setImage(with: urlString, progressBlock: { (receivedSize, totalSize) in
+                        self.indicatorView.startAnimating()
+                    }, completionHandler: { (image, error, cacheType, imageUrl) in
+                        self.indicatorView.stopAnimating()
+                    })
+                case .Local:
+                    imageView.image = imagesArray[i].image //本地图片
+                }
             }
             
             //给相应的数组赋值
             imageViewArray.append(imageView)
             scrollViewArray.append(bgScrollView)
             
-            if let image = imageView.image {
-                if i > 0 {
-                    //设置UIScrollView的滚动范围和图片的真实尺寸一致
-                    bgScrollView.contentSize = image.size
-                }
-            }
+//            if let image = imageView.image {
+//                if i > 0 {
+//                    //设置UIScrollView的滚动范围和图片的真实尺寸一致
+//                    bgScrollView.contentSize = image.size
+//                }
+//            }
         }
     }
     
@@ -178,7 +185,7 @@ extension ZZJMultipleImagesContentView {
         if !isMaxScale {
             isMaxScale = true
             
-            let newScale = scrollViewArray[currentIndexOfImage].zoomScale * 1.5
+            let newScale = scrollViewArray[currentIndexOfImage].zoomScale * maxScale
             let zoomRect = self.zoomRectForScale(scale: newScale, center: gesture.location(in: gesture.view))
             scrollViewArray[currentIndexOfImage].zoom(to: zoomRect, animated: true)
             
@@ -252,6 +259,8 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
             
             let offSet = scrollView.contentOffset
             DebugPrint(message: "offSet: \(offSet)")
+            
+            
             DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
             let difference = offSet.y - screenHeight
             DebugPrint(message: "difference: \(difference)")
@@ -300,10 +309,8 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         
         if scrollView == scrollViewArray[currentIndexOfImage] {
-            let curImgView = imageViewArray[currentIndexOfImage]
-            let offSetX = (scrollView.bounds.size.width > scrollView.contentSize.width) ? (scrollView.bounds.size.width - scrollView.contentSize.width) / 2 : 0.0
-            let offSetY = (scrollView.bounds.size.height > scrollView.contentSize.height) ? (scrollView.bounds.size.height - scrollView.contentSize.height) / 2 : 0.0
-            curImgView.center = CGPoint(x: scrollView.contentSize.width / 2 + offSetX, y: scrollView.contentSize.height / 2 + offSetY)
+            
+            
         }
     }
 }

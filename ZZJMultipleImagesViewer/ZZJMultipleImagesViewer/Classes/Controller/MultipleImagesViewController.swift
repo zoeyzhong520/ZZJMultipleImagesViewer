@@ -74,7 +74,7 @@ extension MultipleImagesViewController {
 //        }
 
         for i in 0..<imageURLArray.count {
-            let model = MultipleImagesModel.createModel(image: nil, url: imageURLArray[i])
+            let model = MultipleImagesModel.createModel(image: nil, url: imageURLArray[i], imageType: ImageType.Net)
             imagesArray.append(model)
         }
         
