@@ -131,6 +131,26 @@ extension ZZJMultipleImagesContentView {
                 }
             }
             
+            let multipleImagesDescriptionView = MultipleImagesDescriptionView(frame: .zero, model: imagesArray[i])
+            scrollView.addSubview(multipleImagesDescriptionView)
+            //添加约束
+            multipleImagesDescriptionView.translatesAutoresizingMaskIntoConstraints = false
+            //1.左边约束
+            let left:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .left, relatedBy: .equal, toItem: imageView, attribute: .left, multiplier: 1.0, constant: 0)
+            multipleImagesDescriptionView.superview?.addConstraint(left)
+            
+            //2.右边约束
+            let right:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .right, relatedBy: .equal, toItem: imageView, attribute: .right, multiplier: 1.0, constant: 0)
+            multipleImagesDescriptionView.superview?.addConstraint(right)
+            
+            //3.下边约束
+            let bottom:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .bottom, relatedBy: .equal, toItem: imageView, attribute: .bottom, multiplier: 1.0, constant: 0)
+            multipleImagesDescriptionView.superview?.addConstraint(bottom)
+            
+            //4.高度约束
+            let height:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0.0, constant: MultipleImagesDescriptionView.getViewHeight(withModel: imagesArray[i]))
+            multipleImagesDescriptionView.addConstraint(height)
+            
             //给相应的数组赋值
             imageViewArray.append(imageView)
             scrollViewArray.append(bgScrollView)

@@ -14,12 +14,16 @@ class MultipleImagesModel: NSObject {
     var url:String?
     var imageType:ImageType?
     
+    var desc:String?
+    
     ///创建model的方法
-    class func createModel(image: UIImage?, url: String?, imageType: ImageType?) -> MultipleImagesModel {
+    class func createModel(image: UIImage?, url: String?, imageType: ImageType?, desc: String?) -> MultipleImagesModel {
         let model = MultipleImagesModel()
         model.image = image
         model.url = url
         model.imageType = imageType
+        
+        model.desc = desc
         return model
     }
 }

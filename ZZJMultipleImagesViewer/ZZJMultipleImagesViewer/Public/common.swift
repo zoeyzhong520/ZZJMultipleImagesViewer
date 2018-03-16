@@ -49,7 +49,15 @@ func DebugPrint<T>(message: T, file: String = #file, funciton: String = #functio
     #endif
 }
 
+///常规字体
+let ZZJ_systemFontWith: (CGFloat) -> UIFont = { font in
+    return UIFont.systemFont(ofSize: font)
+}
 
+///加粗字体
+let ZZJ_boldFontWith: (CGFloat) -> UIFont = { font in
+    return UIFont.boldSystemFont(ofSize: font)
+}
 
 
 
