@@ -41,7 +41,7 @@ class ZZJMultipleImagesContentView: UIView {
     private var isMaxScale = false
     
     ///maxScale 放大的最大限度
-    private var maxScale:CGFloat = 3.0
+    private var maxScale:CGFloat = 2.0
     
     ///minScale 缩小的最大限度
     private var minScale:CGFloat = 1.0
@@ -80,10 +80,10 @@ extension ZZJMultipleImagesContentView {
         self.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
         
         if scrollView == nil {
-            DebugPrint(message: "imagesArray: \(imagesArray)")
+//            DebugPrint(message: "imagesArray: \(imagesArray)")
             //scrollView
             scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
-            scrollView.backgroundColor = UIColor.white
+            scrollView.backgroundColor = UIColor.black
             scrollView.isUserInteractionEnabled = true
             scrollView.isPagingEnabled = true
             scrollView.delegate = self
@@ -140,10 +140,13 @@ extension ZZJMultipleImagesContentView {
     //MARK: - 添加手势
     ///添加单击手势
     fileprivate func addTapGestureRecognizer(view: UIView) {
+        
+        //单击
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
         singleTap.numberOfTapsRequired = 1
         view.addGestureRecognizer(singleTap)
         
+        //双击
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapAction(gesture:)))
         doubleTap.numberOfTapsRequired = 2
         view.addGestureRecognizer(doubleTap)
@@ -243,27 +246,24 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
             scrollViewArray[currentIndexOfImage].setZoomScale(minScale, animated: true)
             isMaxScale = false
         }
-        
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         if scrollView == scrollViewArray[currentIndexOfImage] {
             
-            let offSet = scrollView.contentOffset
-            DebugPrint(message: "offSet: \(offSet)")
+//            let offSet = scrollView.contentOffset
+//            DebugPrint(message: "offSet: \(offSet)")
             
-            
-            DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
-            let difference = offSet.y - screenHeight
-            DebugPrint(message: "difference: \(difference)")
-            
+//            DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
+//            let difference = offSet.y - screenHeight
+//            DebugPrint(message: "difference: \(difference)")
             
         } else if scrollView == self.scrollView {
             
             let offSet = scrollView.contentOffset
-            DebugPrint(message: "offSet: \(offSet)")
-            DebugPrint(message: "lastContentOffset: \(lastContentOffset)")
+//            DebugPrint(message: "offSet: \(offSet)")
+//            DebugPrint(message: "lastContentOffset: \(lastContentOffset)")
             
             if lastContentOffset == nil {
                 return
@@ -271,17 +271,12 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
             
             if lastContentOffset.x < offSet.x {
                 //向左滑动
-                DebugPrint(message: "向左滑动")
-                
-                
+//                DebugPrint(message: "向左滑动")
             } else {
                 //向右滑动
-                DebugPrint(message: "向右滑动")
-                
-                
+//                DebugPrint(message: "向右滑动")
             }
         }
-        
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -303,7 +298,6 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
         
         if scrollView == scrollViewArray[currentIndexOfImage] {
             
-            
         }
     }
 }
@@ -322,15 +316,6 @@ extension ZZJMultipleImagesContentView {
         return zoomRect
     }
 }
-
-
-
-
-
-
-
-
-
 
 
 
