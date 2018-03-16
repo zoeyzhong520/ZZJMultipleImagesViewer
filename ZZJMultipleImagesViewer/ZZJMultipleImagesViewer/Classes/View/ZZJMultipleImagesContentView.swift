@@ -134,13 +134,6 @@ extension ZZJMultipleImagesContentView {
             //给相应的数组赋值
             imageViewArray.append(imageView)
             scrollViewArray.append(bgScrollView)
-            
-//            if let image = imageView.image {
-//                if i > 0 {
-//                    //设置UIScrollView的滚动范围和图片的真实尺寸一致
-//                    bgScrollView.contentSize = image.size
-//                }
-//            }
         }
     }
     
