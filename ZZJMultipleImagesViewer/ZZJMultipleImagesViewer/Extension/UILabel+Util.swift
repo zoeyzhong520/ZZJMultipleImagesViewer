@@ -200,10 +200,11 @@ extension UILabel {
     ///   - labelText: 内容
     ///   - font: 字体
     ///   - ZSapce: 字间距
-    func ZZJ_setLineSpace(withLineSpace lineSpace: CGFloat, withAlignment alignment: NSTextAlignment = NSTextAlignment.left, withLabelText labelText: String, withFont font: UIFont, withZSpace ZSapce: CGFloat) {
+    ///   - lineBreakMode: 文本换行方式
+    func ZZJ_setLineSpace(withLineSpace lineSpace: CGFloat, withAlignment alignment: NSTextAlignment = NSTextAlignment.left, withLabelText labelText: String, withFont font: UIFont, withZSpace ZSapce: CGFloat, withLineBreakMode lineBreakMode: NSLineBreakMode = .byCharWrapping) {
         
         let paraStyle = NSMutableParagraphStyle()
-        paraStyle.lineBreakMode = .byCharWrapping
+        paraStyle.lineBreakMode = lineBreakMode
         paraStyle.alignment = alignment
         paraStyle.lineSpacing = lineSpace //设置行间距
         paraStyle.hyphenationFactor = 1.0
@@ -233,10 +234,11 @@ extension UILabel {
     ///   - width: 宽度
     ///   - lineSpace: 行间距
     ///   - ZSapce: 字间距
-    func ZZJ_getSpaceLabelHeight(withText text: String, withFont font: UIFont, withAlignment alignment: NSTextAlignment = NSTextAlignment.left, withWidth width: CGFloat, withLineSpace lineSpace: CGFloat, withZSpace ZSapce: CGFloat) -> CGFloat {
+    ///   - lineBreakMode: 文本换行方式
+    func ZZJ_getSpaceLabelHeight(withText text: String, withFont font: UIFont, withAlignment alignment: NSTextAlignment = NSTextAlignment.left, withWidth width: CGFloat, withLineSpace lineSpace: CGFloat, withZSpace ZSapce: CGFloat, withLineBreakMode lineBreakMode: NSLineBreakMode = .byCharWrapping) -> CGFloat {
         
         let paraStyle = NSMutableParagraphStyle()
-        paraStyle.lineBreakMode = .byCharWrapping
+        paraStyle.lineBreakMode = lineBreakMode
         paraStyle.alignment = alignment
         paraStyle.lineSpacing = lineSpace
         paraStyle.hyphenationFactor = 1.0
