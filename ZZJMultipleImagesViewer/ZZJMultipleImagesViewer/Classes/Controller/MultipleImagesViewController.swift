@@ -80,7 +80,7 @@ extension MultipleImagesViewController {
     @objc fileprivate func imgTapAction() {
         let model = MultipleImagesModel.createModel(image: imageView.image, url: nil, imageType: ImageType.Local, desc: "2017年小米质量委员会成立，全年共召开245次跨部门质量讨论会，专项改善200余项。雷军获质量之光“年度质量人物奖”。2018年小米将会继续狠抓品质与创新，做出更多高品质、可信赖的红米国民手机")
         let multipleImagesView = ZZJMultipleImagesContentView(frame: .zero, imagesArray: [model])
-        multipleImagesView.showInView(view: ZZJKeyWindow)
+        multipleImagesView.showInView(view: zzj_KeyWindow)
     }
     
     ///set ZZJMultipleImagesContentView
@@ -98,7 +98,7 @@ extension MultipleImagesViewController {
         }
         
         let multipleImagesView = ZZJMultipleImagesContentView(frame: .zero, imagesArray: imagesArray)
-        multipleImagesView.showInView(view: ZZJKeyWindow)
+        multipleImagesView.showInView(view: zzj_KeyWindow)
     }
 }
 

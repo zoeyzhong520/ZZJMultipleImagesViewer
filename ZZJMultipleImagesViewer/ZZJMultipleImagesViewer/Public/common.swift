@@ -16,7 +16,7 @@ let screenWidth = UIScreen.main.bounds.size.width
 let screenHeight = UIScreen.main.bounds.size.height
 
 ///keyWindow
-let ZZJKeyWindow = UIApplication.shared.keyWindow
+let zzj_KeyWindow = UIApplication.shared.keyWindow
 
 ///RGB
 let RGB: (CGFloat, CGFloat, CGFloat) -> UIColor = { r, g, b in
@@ -24,7 +24,7 @@ let RGB: (CGFloat, CGFloat, CGFloat) -> UIColor = { r, g, b in
 }
 
 ///RGBA
-let RGBA: (CGFloat, CGFloat, CGFloat, CGFloat) -> UIColor = {
+let RGBAColor: (CGFloat, CGFloat, CGFloat, CGFloat) -> UIColor = {
     r, g, b, a in
     return UIColor(red: r, green: g, blue: b, alpha: a)
 }
@@ -50,12 +50,12 @@ func DebugPrint<T>(message: T, file: String = #file, funciton: String = #functio
 }
 
 ///常规字体
-let ZZJ_systemFontWith: (CGFloat) -> UIFont = { font in
+let zzj_SystemFontWithSize: (CGFloat) -> UIFont = { font in
     return UIFont.systemFont(ofSize: font)
 }
 
 ///加粗字体
-let ZZJ_boldFontWith: (CGFloat) -> UIFont = { font in
+let zzj_BoldFontWithSize: (CGFloat) -> UIFont = { font in
     return UIFont.boldSystemFont(ofSize: font)
 }
 
