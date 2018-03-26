@@ -17,34 +17,34 @@ enum ImageType: Int {
 class ZZJMultipleImagesContentView: UIView {
 
     ///scrollView
-    private var scrollView:UIScrollView!
+    fileprivate var scrollView:UIScrollView!
     
     ///imagesArray 图片数组
-    private var imagesArray = [MultipleImagesModel]()
+    fileprivate var imagesArray = [MultipleImagesModel]()
     
     ///image的数量
-    private var imageCount:Int = 0
+    fileprivate var imageCount:Int = 0
     
     ///currentIndexOfImage 当前是第几张
-    private var currentIndexOfImage:Int = 0
+    fileprivate var currentIndexOfImage:Int = 0
+    
+    ///oldIndex 记录滚动过的位置
+    fileprivate var oldIndex:Int = 0
     
     ///imageViewArray 存放imageView的数组
-    private var imageViewArray = [UIImageView]()
+    fileprivate var imageViewArray = [UIImageView]()
     
     ///scrollViewArray 存放scrollView的数组
-    private var scrollViewArray = [UIScrollView]()
-    
-    ///UIScrollView 滚动偏移量
-    private var lastContentOffset:CGPoint!
+    fileprivate var scrollViewArray = [UIScrollView]()
     
     ///isMaxScale 是否放大到最大限度
-    private var isMaxScale = false
+    fileprivate var isMaxScale = false
     
     ///maxScale 放大的最大限度
-    private var maxScale:CGFloat = 2.0
+    fileprivate var maxScale:CGFloat = 3.0
     
     ///minScale 缩小的最大限度
-    private var minScale:CGFloat = 1.0
+    fileprivate var minScale:CGFloat = 1.0
     
     ///UIActivityIndicatorView
     fileprivate lazy var indicatorView:UIActivityIndicatorView = {
@@ -80,7 +80,6 @@ extension ZZJMultipleImagesContentView {
         self.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight)
         
         if scrollView == nil {
-//            DebugPrint(message: "imagesArray: \(imagesArray)")
             //scrollView
             scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
             scrollView.backgroundColor = UIColor.black
@@ -107,8 +106,7 @@ extension ZZJMultipleImagesContentView {
             bgScrollView.minimumZoomScale = minScale
             scrollView.addSubview(bgScrollView)
             
-            let imageView = UIImageView(frame: bgScrollView.bounds)
-            imageView.contentMode = .scaleAspectFit
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenWidth)) //设置默认frame
             imageView.isUserInteractionEnabled = true
             imageView.isMultipleTouchEnabled = true
             imageView.tag = i
@@ -120,42 +118,69 @@ extension ZZJMultipleImagesContentView {
             if let imageType = imagesArray[i].imageType {
                 switch imageType {
                 case .Net:
-                    let urlString = URL(string: imagesArray[i].url == nil ? "" : imagesArray[i].url!)
+                    let urlString = URL(string: imagesArray[i].url ?? "")
                     imageView.kf.setImage(with: urlString, progressBlock: { (receivedSize, totalSize) in
                         self.indicatorView.startAnimating()
                     }, completionHandler: { (image, error, cacheType, imageUrl) in
                         self.indicatorView.stopAnimating()
-                    })
+                        imageView.frame = self.setImageViewFrame(withImage: image) //重设frame
+                    }) //网络图片
                 case .Local:
                     imageView.image = imagesArray[i].image //本地图片
+                    imageView.frame = self.setImageViewFrame(withImage: imageView.image) //重设frame
                 }
             }
             
             //展示描述文本的View
-            let multipleImagesDescriptionView = MultipleImagesDescriptionView(frame: .zero, model: imagesArray[i])
-            scrollView.addSubview(multipleImagesDescriptionView)
-            //添加约束
-            multipleImagesDescriptionView.translatesAutoresizingMaskIntoConstraints = false
-            //1.左边约束
-            let left:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .left, relatedBy: .equal, toItem: imageView, attribute: .left, multiplier: 1.0, constant: 0)
-            scrollView.addConstraint(left)
-            
-            //2.右边约束
-            let right:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .right, relatedBy: .equal, toItem: imageView, attribute: .right, multiplier: 1.0, constant: 0)
-            scrollView.addConstraint(right)
-            
-            //3.下边约束
-            let bottom:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .bottom, relatedBy: .equal, toItem: imageView, attribute: .bottom, multiplier: 1.0, constant: 0)
-            scrollView.addConstraint(bottom)
-            
-            //4.高度约束
-            let height:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: MultipleImagesDescriptionView.getViewHeight(withModel: imagesArray[i]))
-            scrollView.addConstraint(height)
+            self.addMultipleImagesDescriptionView(withTag: i, withView: bgScrollView)
             
             //给相应的数组赋值
             imageViewArray.append(imageView)
             scrollViewArray.append(bgScrollView)
         }
+    }
+    
+    ///设置ImageView的frame
+    fileprivate func setImageViewFrame(withImage image: UIImage?) -> CGRect {
+        
+        guard let image = image else {
+            DebugPrint(message: "image is nil")
+            return CGRect(x: 0, y: 0, width: screenWidth, height: screenWidth)
+        }
+        
+        let imageView_X = image.size.width > screenWidth ? screenWidth : image.size.width
+        var imageView_Y = image.size.height > screenHeight ? screenHeight : image.size.height
+        if image.size.width > screenWidth {
+            //图片尺寸的宽度大于屏幕宽，则按比例取得高度
+            imageView_Y = image.size.height * (screenWidth / image.size.width)
+        }
+        
+        return CGRect(x: (screenWidth - imageView_X) / 2, y: (screenHeight - imageView_Y) / 2, width: imageView_X, height: imageView_Y)
+    }
+    
+    ///展示描述文本的View
+    fileprivate func addMultipleImagesDescriptionView(withTag tag: Int, withView view: UIView) {
+        
+        let multipleImagesDescriptionView = MultipleImagesDescriptionView(frame: .zero, model: imagesArray[tag])
+        scrollView.addSubview(multipleImagesDescriptionView)
+        
+        //添加约束
+        multipleImagesDescriptionView.translatesAutoresizingMaskIntoConstraints = false
+        //1.左边约束
+        let left:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1.0, constant: 0)
+        scrollView.addConstraint(left)
+        
+        //2.右边约束
+        let right:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1.0, constant: 0)
+        scrollView.addConstraint(right)
+        
+        //3.下边约束
+        let bottom:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1.0, constant: 0)
+        scrollView.addConstraint(bottom)
+        
+        //4.高度约束
+        let height:NSLayoutConstraint = NSLayoutConstraint(item: multipleImagesDescriptionView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: MultipleImagesDescriptionView.getViewHeight(withModel: imagesArray[tag]))
+        scrollView.addConstraint(height)
     }
     
     //MARK: - 添加手势
@@ -248,9 +273,6 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         DebugPrint(message: #function)
-        if scrollView == self.scrollView {
-            lastContentOffset = scrollView.contentOffset
-        }
     }
     
     func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
@@ -258,50 +280,25 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        DebugPrint(message: #function)
-        
         if scrollView == self.scrollView {
-            //currentIndexOfImage
+            DebugPrint(message: #function)
+            //更新currentIndexOfImage的值
             currentIndexOfImage = Int(scrollView.contentOffset.x / screenWidth)
             DebugPrint(message: "当前是第\(currentIndexOfImage+1)张图片～")
+            
             scrollViewArray[currentIndexOfImage].setZoomScale(minScale, animated: true)
-            isMaxScale = false
-        }
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-        if scrollView == scrollViewArray[currentIndexOfImage] {
-            
-//            let offSet = scrollView.contentOffset
-//            DebugPrint(message: "offSet: \(offSet)")
-            
-//            DebugPrint(message: "scrollView.contentSize: \(scrollView.contentSize)")
-//            let difference = offSet.y - screenHeight
-//            DebugPrint(message: "difference: \(difference)")
-            
-        } else if scrollView == self.scrollView {
-            
-            let offSet = scrollView.contentOffset
-//            DebugPrint(message: "offSet: \(offSet)")
-//            DebugPrint(message: "lastContentOffset: \(lastContentOffset)")
-            
-            if lastContentOffset == nil {
-                return
-            }
-            
-            if lastContentOffset.x < offSet.x {
-                //向左滑动
-//                DebugPrint(message: "向左滑动")
-            } else {
-                //向右滑动
-//                DebugPrint(message: "向右滑动")
-            }
         }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         DebugPrint(message: #function)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView == self.scrollView {
+//            let offsetX = scrollView.contentOffset.x
+//            DebugPrint(message: "offsetX: \(offsetX)")
+        }
     }
     
     //代理方法，告诉ScrollView要缩放的是哪个视图
@@ -312,6 +309,11 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         if scrollView == scrollViewArray[currentIndexOfImage] {
             scrollView.setZoomScale(scale, animated: true)
+            if scale > minScale && scale <= maxScale {
+                isMaxScale = true
+            } else {
+                isMaxScale = false
+            }
         }
     }
     
@@ -319,6 +321,10 @@ extension ZZJMultipleImagesContentView: UIScrollViewDelegate {
         
         if scrollView == scrollViewArray[currentIndexOfImage] {
             
+            //实现图片在缩放过程中居中
+            let offsetX = scrollView.bounds.size.width > scrollView.contentSize.width ? (scrollView.bounds.size.width - scrollView.contentSize.width) / 2 : 0.0
+            let offsetY = scrollView.bounds.size.height > scrollView.contentSize.height ? (scrollView.bounds.size.height - scrollView.contentSize.height) / 2 : 0.0
+            imageViewArray[currentIndexOfImage].center = CGPoint(x: scrollView.contentSize.width / 2 + offsetX, y: scrollView.contentSize.height / 2 + offsetY)
         }
     }
 }

@@ -40,7 +40,7 @@ extension MultipleImagesDescriptionView {
     
     fileprivate func createView() {
         
-        self.backgroundColor = RGBAColor(0, 0, 0, 0.2)
+        self.backgroundColor = RGBAColor(0, 0, 0, 0.6)
         
         //label
         label.text = model?.desc
